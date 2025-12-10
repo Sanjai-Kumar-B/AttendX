@@ -62,7 +62,7 @@ const eeeTimetable = {
 };
 
 // Period timings for different year groups
-const periodTimingsYears2And4 = {
+const periodTimingsYear2 = {
   1: "9:25 AM - 10:15 AM",
   2: "10:15 AM - 11:00 AM", 
   3: "11:25 AM - 12:10 PM",
@@ -82,9 +82,19 @@ const periodTimingsYear3 = {
   7: "3:40 PM - 4:30 PM"
 };
 
+const periodTimingsYear4 = {
+  1: "9:25 AM - 10:15 AM",
+  2: "10:15 AM - 11:00 AM", 
+  3: "11:25 AM - 12:10 PM",
+  4: "12:10 PM - 1:00 PM",
+  5: "1:50 PM - 2:40 PM",
+  6: "2:40 PM - 3:30 PM",
+  7: "3:40 PM - 4:30 PM"
+};
+
 // Map staff to their year groups based on timetable
 const staffYearMapping = {
-  // Year II staff
+  // Year II staff (teaching Year II only or Year II + others)
   "Mrs.C.Rajeswari": [2, 3, 4],
   "Mr.K.Vinoth Bresnav": [2, 3, 4],
   "Mrs.C.Vaishnavi": [2],
@@ -99,7 +109,7 @@ const staffYearMapping = {
   "Dr.A.Jeevanandham": [2],
   "Mr.M.K.Anandkumar": [2, 3, 4],
   "Dr.K.Muthuvel": [2, 3, 4],
-  // Year III staff
+  // Year III & IV staff
   "Dr.G.Srinivasan": [3, 4],
   "Ms.K.S.Nanthini": [3, 4],
   "Dr.C.Augustine Crispin": [3],
@@ -246,13 +256,20 @@ function updateCurrentPeriod() {
             currentPeriod = parseInt(period);
             const currentPeriodElement = document.getElementById('currentPeriod');
             if (currentPeriodElement) {
-                // Show both timings if different
-                const timing2And4 = periodTimingsYears2And4[period];
+                // Show timings for all three years
+                const timing2 = periodTimingsYear2[period];
                 const timing3 = periodTimingsYear3[period];
-                if (timing2And4 === timing3) {
-                    currentPeriodElement.textContent = `${period} (${timing2And4})`;
+                const timing4 = periodTimingsYear4[period];
+                
+                if (timing2 === timing3 && timing3 === timing4) {
+                    // All same timing
+                    currentPeriodElement.textContent = `${period} (${timing2})`;
+                } else if (timing2 === timing4) {
+                    // Year 2 and 4 same, Year 3 different
+                    currentPeriodElement.textContent = `${period} (Yr II/IV: ${timing2} | Yr III: ${timing3})`;
                 } else {
-                    currentPeriodElement.textContent = `${period} (Yr II/IV: ${timing2And4} | Yr III: ${timing3})`;
+                    // All different (show all three)
+                    currentPeriodElement.textContent = `${period} (Yr II: ${timing2} | Yr III: ${timing3} | Yr IV: ${timing4})`;
                 }
             }
             // Update staff availability when period changes
@@ -442,11 +459,21 @@ function getNextClass(staffName, today) {
 // Helper function to get period timing based on staff's year group
 function getPeriodTiming(staffName, period) {
     const yearGroups = staffYearMapping[staffName] || [2, 4];
-    // If staff teaches Year 3, use Year 3 timings, otherwise use Years 2&4
-    if (yearGroups.includes(3) && !yearGroups.includes(2) && !yearGroups.includes(4)) {
+    
+    // Determine which timing to show based on primary year group
+    if (yearGroups.includes(3) && yearGroups.length === 1) {
+        // Teaching only Year 3
         return periodTimingsYear3[period];
+    } else if (yearGroups.includes(4) && !yearGroups.includes(2) && !yearGroups.includes(3)) {
+        // Teaching only Year 4
+        return periodTimingsYear4[period];
+    } else if (yearGroups.includes(2) || (yearGroups.includes(2) && yearGroups.includes(4))) {
+        // Teaching Year 2 or both Year 2 & 4
+        return periodTimingsYear2[period];
+    } else {
+        // Default to Year 2 timing
+        return periodTimingsYear2[period];
     }
-    return periodTimingsYears2And4[period];
 }
 
 function getCurrentSubject(staffName, today, period) {
@@ -467,7 +494,7 @@ function displayTodaySchedule() {
     let scheduleHTML = `
         <div class="alert alert-primary">
             <h5 class="mb-2"><i class="fas fa-calendar-day me-2"></i>Today's Schedule - ${todayName}</h5>
-            <small>Current Period: ${currentPeriod === 0 ? 'Break Time' : `Period ${currentPeriod} (${periodTimingsYears2And4[currentPeriod]})`}</small>
+            <small>Current Period: ${currentPeriod === 0 ? 'Break Time' : `Period ${currentPeriod} (${periodTimingsYear2[currentPeriod]})`}</small>
         </div>
         
         <div class="table-responsive">
@@ -541,13 +568,19 @@ function displayTodaySchedule() {
     for (let period = 1; period <= 7; period++) {
         const isCurrentPeriod = period === currentPeriod;
         const badgeClass = isCurrentPeriod ? 'bg-primary' : 'bg-secondary';
-        const timing2And4 = periodTimingsYears2And4[period];
+        const timing2 = periodTimingsYear2[period];
         const timing3 = periodTimingsYear3[period];
+        const timing4 = periodTimingsYear4[period];
         
-        if (timing2And4 === timing3) {
-            scheduleHTML += `<span class="badge ${badgeClass} me-1 mb-1">Period ${period}: ${timing2And4}</span><br>`;
+        if (timing2 === timing3 && timing3 === timing4) {
+            // All years have same timing
+            scheduleHTML += `<span class="badge ${badgeClass} me-1 mb-1">Period ${period}: ${timing2}</span><br>`;
+        } else if (timing2 === timing4) {
+            // Year 2 and 4 same, Year 3 different
+            scheduleHTML += `<span class="badge ${badgeClass} me-1 mb-1">Period ${period}: Yr II/IV: ${timing2} | Yr III: ${timing3}</span><br>`;
         } else {
-            scheduleHTML += `<span class="badge ${badgeClass} me-1 mb-1">Period ${period}: Yr II/IV: ${timing2And4} | Yr III: ${timing3}</span><br>`;
+            // All different
+            scheduleHTML += `<span class="badge ${badgeClass} me-1 mb-1">Period ${period}: Yr II: ${timing2} | Yr III: ${timing3} | Yr IV: ${timing4}</span><br>`;
         }
     }
     
