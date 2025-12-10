@@ -1943,3 +1943,142 @@ function displayFilteredStaff(filteredStaff) {
     document.getElementById('availableCount').textContent = availableCount;
     document.getElementById('busyCount').textContent = busyCount;
 }
+
+// Staff Management Functions
+function toggleManageStaff() {
+    const panel = document.getElementById('manageStaffPanel');
+    const btn = document.getElementById('manageStaffBtn');
+    
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        btn.innerHTML = '<i class="fas fa-times me-1"></i>Close';
+        btn.classList.remove('btn-light');
+        btn.classList.add('btn-danger');
+        loadStaffManagementList();
+    } else {
+        panel.style.display = 'none';
+        btn.innerHTML = '<i class="fas fa-user-cog me-1"></i>Manage Staff';
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-light');
+    }
+}
+
+function loadStaffManagementList() {
+    const tbody = document.getElementById('staffManagementList');
+    let html = '';
+    
+    eeeStaffData.forEach((staff, index) => {
+        html += `
+            <tr>
+                <td>${staff.name}</td>
+                <td><span class="badge bg-primary">${staff.designation}</span></td>
+                <td>EEE</td>
+                <td><small>${staff.subjectCount} subject(s)</small></td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-warning me-1" onclick="editStaff(${index})" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteStaff(${index})" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    if (html === '') {
+        html = '<tr><td colspan="5" class="text-center text-muted">No staff members found</td></tr>';
+    }
+    
+    tbody.innerHTML = html;
+}
+
+function addNewStaff(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('newStaffName').value.trim();
+    const designation = document.getElementById('newStaffDesignation').value;
+    const department = document.getElementById('newStaffDepartment').value;
+    
+    if (!name || !designation || !department) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    // Check if staff already exists
+    const exists = eeeStaffData.some(staff => staff.name.toLowerCase() === name.toLowerCase());
+    if (exists) {
+        alert('Staff member with this name already exists!');
+        return;
+    }
+    
+    // Add new staff to data
+    const newStaff = {
+        name: name,
+        designation: designation,
+        department: department,
+        subjects: [],
+        subjectCount: 0
+    };
+    
+    eeeStaffData.push(newStaff);
+    
+    // Initialize empty schedule for new staff
+    staffPeriodSchedule[name] = {
+        "MON": [], "TUE": [], "WED": [], "THU": [], "FRI": [], "SAT": []
+    };
+    
+    // Clear form
+    document.getElementById('addStaffForm').reset();
+    
+    // Reload lists
+    loadStaffManagementList();
+    if (document.getElementById('departmentSelect').value === 'EEE') {
+        displayStaffStatus();
+    }
+    
+    alert(`✅ ${name} added successfully!`);
+}
+
+function editStaff(index) {
+    const staff = eeeStaffData[index];
+    
+    const newName = prompt('Edit Staff Name:', staff.name);
+    if (newName && newName.trim() !== '') {
+        const oldName = staff.name;
+        staff.name = newName.trim();
+        
+        // Update schedule mapping
+        if (staffPeriodSchedule[oldName]) {
+            staffPeriodSchedule[newName.trim()] = staffPeriodSchedule[oldName];
+            delete staffPeriodSchedule[oldName];
+        }
+        
+        loadStaffManagementList();
+        if (document.getElementById('departmentSelect').value === 'EEE') {
+            displayStaffStatus();
+        }
+        
+        alert('✅ Staff updated successfully!');
+    }
+}
+
+function deleteStaff(index) {
+    const staff = eeeStaffData[index];
+    
+    if (confirm(`Are you sure you want to delete ${staff.name}?`)) {
+        // Remove from data
+        eeeStaffData.splice(index, 1);
+        
+        // Remove schedule
+        delete staffPeriodSchedule[staff.name];
+        
+        // Reload lists
+        loadStaffManagementList();
+        if (document.getElementById('departmentSelect').value === 'EEE') {
+            displayStaffStatus();
+        }
+        
+        alert('✅ Staff deleted successfully!');
+    }
+}
