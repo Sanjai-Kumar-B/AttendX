@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#1e3c72">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Dean's Panel - Staff Monitoring System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary mb-3 mb-md-4">
+    <div class="container-fluid px-2 px-md-3">
+      <a class="navbar-brand" href="#">
+        <img src="https://excelinstitutions.com/excel_engg/wp-content/uploads/2021/02/logo_engg.png" alt="Excel Engineering College" class="navbar-logo me-2">
+        <span class="navbar-title">Dean's Panel</span>
+      </a>
+      <div class="navbar-nav ms-auto">
+        <span class="navbar-text me-0">
+          <i class="fas fa-clock me-1 d-none d-sm-inline"></i>
+          <span id="currentDateTime" class="small"></span>
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container px-2 px-md-3">
+    <!-- Department Selection -->
+    <div class="card mb-3 mb-md-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-building me-2"></i>Select Department</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-2 g-md-3 align-items-center">
+          <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <select class="form-control" id="departmentSelect" onchange="loadDepartmentData()">
+              <option value="">-- Select Department --</option>
+              <option value="EEE">Electronics and Electrical Engineering</option>
+              <option value="ECE">Electronics and Communication Engineering</option>
+              <option value="BME">Bio Medical Engineering</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="card bg-success text-white text-center">
+                  <div class="card-body py-2 px-1">
+                    <h5 class="mb-0 fw-bold" id="availableCount">0</h5>
+                    <small class="d-block fw-semibold" style="font-size: 0.75rem;">Available</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card bg-warning text-center" style="color: #000;">
+                  <div class="card-body py-2 px-1">
+                    <h5 class="mb-0 fw-bold" id="busyCount">0</h5>
+                    <small class="d-block fw-semibold" style="font-size: 0.75rem;">In Class</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff Status Display -->
+    <div id="staffStatusContainer" style="display:none;">
+      <!-- Current Period Info -->
+      <div class="card mb-3 mb-md-4">
+        <div class="card-header bg-info text-white">
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
+            <h6 class="mb-1 mb-sm-0">
+              <i class="fas fa-clock me-2"></i>
+              Period: <span id="currentPeriod">-</span>
+            </h6>
+            <span id="currentTime" class="small"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff Availability -->
+      <div class="row g-2 g-md-3">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+          <div class="card h-100">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0"><i class="fas fa-user-check me-2"></i>Available Staff</h6>
+            </div>
+            <div class="card-body" id="availableStaff" style="max-height: 500px; overflow-y: auto;">
+              <!-- Available staff will be loaded here -->
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+              <h6 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Staff in Class</h6>
+            </div>
+            <div class="card-body" id="busyStaff" style="max-height: 500px; overflow-y: auto;">
+              <!-- Busy staff will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff Schedule Overview -->
+      <div class="card mt-3 mt-md-4">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Today's Schedule</h6>
+        </div>
+        <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+          <div id="todaySchedule">
+            <!-- Today's schedule will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Welcome Message -->
+    <div id="welcomeMessage" class="text-center">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Welcome to Dean's Panel. Please select a department to view staff status and availability.
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

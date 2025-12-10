@@ -1,0 +1,17 @@
+{
+  "name": "staff-attendance-system",
+  "version": "1.0.0",
+  "description": "Staff Attendance & Period Monitoring System for College Department",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
