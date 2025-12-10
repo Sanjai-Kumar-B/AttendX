@@ -1802,3 +1802,111 @@ async function generateReport() {
     html += '</tbody></table>';
     document.getElementById('reportContent').innerHTML = html;
 }
+
+// Search functionality
+let searchQuery = '';
+
+function filterStaff() {
+    searchQuery = document.getElementById('staffSearch').value.toLowerCase().trim();
+    
+    if (searchQuery === '') {
+        // Show all staff
+        displayStaffStatus();
+        document.getElementById('searchResults').textContent = '';
+        return;
+    }
+    
+    // Filter staff data
+    const filteredStaff = eeeStaffData.filter(staff => 
+        staff.name.toLowerCase().includes(searchQuery) || 
+        staff.designation.toLowerCase().includes(searchQuery)
+    );
+    
+    // Update search results count
+    const resultCount = filteredStaff.length;
+    document.getElementById('searchResults').textContent = 
+        `Found ${resultCount} staff member${resultCount !== 1 ? 's' : ''} matching "${searchQuery}"`;
+    
+    // Display filtered results
+    displayFilteredStaff(filteredStaff);
+}
+
+function clearSearch() {
+    document.getElementById('staffSearch').value = '';
+    searchQuery = '';
+    document.getElementById('searchResults').textContent = '';
+    displayStaffStatus();
+}
+
+function displayFilteredStaff(filteredStaff) {
+    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const today = days[new Date().getDay()];
+    
+    let availableHTML = '';
+    let busyHTML = '';
+    let availableCount = 0;
+    let busyCount = 0;
+    
+    if (filteredStaff.length === 0) {
+        availableHTML = '<div class="alert alert-warning"><i class="fas fa-search me-2"></i>No staff members found matching your search.</div>';
+        busyHTML = '<div class="alert alert-warning"><i class="fas fa-search me-2"></i>No staff members found matching your search.</div>';
+    } else {
+        filteredStaff.forEach(staff => {
+            const staffSchedule = staffPeriodSchedule[staff.name];
+            const todayPeriods = staffSchedule && staffSchedule[today] ? staffSchedule[today] : [];
+            
+            const isBusy = currentPeriod !== 0 && todayPeriods.includes(currentPeriod);
+            const nextClass = getNextClass(staff.name, today);
+            const currentSubject = isBusy ? getCurrentSubject(staff.name, today, currentPeriod) : null;
+            
+            if (isBusy) {
+                busyCount++;
+                busyHTML += `
+                    <div class="staff-card mb-2 p-3 bg-light rounded border-start border-danger border-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1 text-danger"><i class="fas fa-chalkboard-teacher me-1"></i>${staff.name}</h6>
+                                <small class="text-muted">${staff.designation}</small>
+                                ${currentSubject ? `<br><small class="text-primary"><i class="fas fa-book me-1"></i>Teaching: ${currentSubject}</small>` : ''}
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-danger">In Class</span>
+                                <small class="d-block text-muted">Period ${currentPeriod}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                availableCount++;
+                availableHTML += `
+                    <div class="staff-card mb-2 p-3 bg-light rounded border-start border-success border-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1 text-success"><i class="fas fa-user-check me-1"></i>${staff.name}</h6>
+                                <small class="text-muted">${staff.designation}</small>
+                                ${nextClass ? `<br><small class="text-warning"><i class="fas fa-clock me-1"></i>Next: ${nextClass}</small>` : ''}
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success">Available</span>
+                                <small class="d-block text-muted">${staff.subjectCount} subjects</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    }
+    
+    if (availableHTML === '') {
+        availableHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>No available staff matching your search.</div>';
+    }
+    
+    if (busyHTML === '') {
+        busyHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>No busy staff matching your search.</div>';
+    }
+    
+    document.getElementById('availableStaff').innerHTML = availableHTML;
+    document.getElementById('busyStaff').innerHTML = busyHTML;
+    document.getElementById('availableCount').textContent = availableCount;
+    document.getElementById('busyCount').textContent = busyCount;
+}

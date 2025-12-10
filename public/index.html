@@ -69,6 +69,30 @@
 
     <!-- Staff Status Display -->
     <div id="staffStatusContainer" style="display:none;">
+      <!-- Search Bar -->
+      <div class="card mb-3">
+        <div class="card-body p-2 p-md-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white">
+              <i class="fas fa-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="staffSearch" 
+              placeholder="Search staff by name or designation..."
+              onkeyup="filterStaff()"
+            >
+            <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+              <i class="fas fa-times"></i> Clear
+            </button>
+          </div>
+          <small class="text-muted d-block mt-2">
+            <span id="searchResults"></span>
+          </small>
+        </div>
+      </div>
+
       <!-- Current Period Info -->
       <div class="card mb-3 mb-md-4">
         <div class="card-header bg-info text-white">

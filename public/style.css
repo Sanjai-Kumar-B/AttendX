@@ -208,6 +208,36 @@ body {
   }
 }
 
+/* Search bar styling */
+#staffSearch {
+  border-left: 0;
+  font-size: 0.95rem;
+}
+
+#staffSearch:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+.input-group-text {
+  border-right: 0;
+  color: #6c757d;
+}
+
+.staff-card.highlight {
+  animation: highlightPulse 1s ease-in-out;
+  border-color: #ffc107 !important;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(255, 193, 7, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+  }
+}
+
 /* Smooth scrolling for overflow areas */
 .card-body[style*="overflow-y"] {
   -webkit-overflow-scrolling: touch;
