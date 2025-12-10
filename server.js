@@ -148,4 +148,10 @@ process.on('SIGTERM', () => {
     process.exit(0);
 });
 
-startServer();
+// For local development
+if (require.main === module) {
+    startServer();
+}
+
+// Export for Vercel
+module.exports = app;
